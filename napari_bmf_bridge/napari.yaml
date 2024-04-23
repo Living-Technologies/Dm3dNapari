@@ -1,0 +1,10 @@
+name: napari-bmf-bridge
+contributions:
+  commands:
+    - id: napari-bmf-bridge.load_meshes
+      title: Loads meshes generated from DM3D
+      python_name: napari_bmf_bridge:load_meshes
+  widgets:
+    - command: napari-bmf-bridge.load_meshes  # note, same as command.id above
+      display_name: Load DM3D Mesh
+      autogenerate: true
