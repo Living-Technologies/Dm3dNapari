@@ -7,6 +7,7 @@ from napari.utils import notifications
 import napari, numpy
 import pathlib
 
+from napari.utils import progress
 
 class ImageDetails:
     def __init__(self, img_layer):
@@ -67,22 +68,25 @@ def load_meshes(layer: Image, file_path: pathlib.Path):
         msg = "The selected file, %s, does not exist"%file_path
         notifications.show_error(msg)
         return
-
+    pbr = progress(total = 100)
+    pbr.set_description("loading file.")
     try:
         tracks = bmf.loadMeshTracks(file_path);
     except Exception as e:
         notifications.show_error("Could not meshes from file %s \n %s"%(file_path, e))
         return
-
+    pbr.set_description("meshes loaded, converting ...")
     if layer is None:
         notifications.show_warning("scale information cannot be extracted from layer %s"%layer)
     details = ImageDetails(layer)
     viewer = napari.viewer.current_viewer()
-
+    pbr.update(5)
+    step = int(95/len(tracks)) + 1
     for t in tracks:
         surf = trackToSurface(t)
         surf.scale = details.getScale()
         surf.translate = details.getOffset()
         surf.name = t.name
         viewer.add_layer(surf)
-
+        pbr.update(step)
+    pbr.close()
